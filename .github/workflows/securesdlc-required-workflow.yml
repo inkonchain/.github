@@ -3,11 +3,17 @@ run-name: "[Nautilus SecureSDLC Required] Ref:${{ github.ref_name }} Event:${{ g
 
 on:
   workflow_dispatch: {}
-  workflow_call: {}
+  workflow_call:
+    secrets:
+      SEMGREP_APP_URL:
+        required: false
+      SEMGREP_APP_TOKEN:
+        required: false
+      SDLC_SLACK_NOTIFICATIONS:
+        required: false
   pull_request: {}
-  # pull_request_target: {} # Gives workflows excessive permissions. Not wanted.
-  # Needed by repos with a merge queue: the gate re-runs on the gh-readonly-queue
-  # ref, so a workflow that never fires there can never report and entries deadlock.
+  # pull_request_target is intentionally not used because it would grant workflows excessive permissions.
+  # The merge queue needs this event so its required status check can be reported.
   merge_group: {}
 
 jobs:
@@ -15,9 +21,9 @@ jobs:
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status  
-    uses: nautilus-wraith/securesdlc-umbrella/.github/workflows/securesdlc-umbrella.yml@release-stable
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    uses: nautilus-wraith/securesdlc-umbrella/.github/workflows/securesdlc-umbrella.yml@d61b052e36d795bf5ed9eeb116b4851cc0bbdcdd
     secrets:
       SEMGREP_APP_URL: ${{ secrets.SEMGREP_APP_URL }}
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-      SDLC_SLACK_NOTIFICATIONS: ${{ secrets.SDLC_SLACK_NOTIFICATIONS }}      
+      SDLC_SLACK_NOTIFICATIONS: ${{ secrets.SDLC_SLACK_NOTIFICATIONS }}
